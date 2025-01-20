@@ -105,12 +105,19 @@ if PLANE_ICAO == "C525" then
 -- we don't need either of the index tables for the Speed table so only store the data table
 	local SpeedTable = readCSVIntoIndexedArray(dataDirectory.."SpeedTable.csv")
 
+-- initialise variables used for Listbox and Checkboxes
 	local mode = 1
+	local antiIcingOn = false
+	local setMem = true
 
 -- get X-Plane datarefs
 	dataref("PressureAlt_dr", "sim/flightmodel2/position/pressure_altitude")
 	dataref("RealAirTemp_dr", "sim/weather/temperature_le_c")
-	local antiIcingTable_df = dataref_table("sim/cockpit/switches/anti_ice_inlet_heat_per_engine")
+--	local antiIcingTable_df = dataref_table("sim/cockpit/switches/anti_ice_inlet_heat_per_engine")
+
+	dataref("mem_device_1_dr", "afm/cj/center_panel/mem_device_1", "writable")
+	dataref("mem_device_2_dr", "afm/cj/center_panel/mem_device_2", "writable")
+	dataref("mem_device_3_dr", "afm/cj/center_panel/mem_device_3", "writable")
 
 	function n1calc_on_build(n1calc_wnd, x, y)  
 
@@ -148,6 +155,17 @@ if PLANE_ICAO == "C525" then
 		if changed then
 			antiIcingOn = newVal
 		end
+		
+		imgui.SameLine()
+		imgui.TextUnformatted("    ")
+		imgui.SameLine()
+				
+-- Display Anto-Icing checkbox
+		changed, newVal = imgui.Checkbox(" Set Mem Display",setMem)
+		if changed then
+			setMem = newVal
+		end
+
 
 -- Look up index values for temp, alt from index tables and corresponding data value from arrays for that mode
 -- Take-Off
@@ -184,6 +202,12 @@ if PLANE_ICAO == "C525" then
 			imgui.PopStyleColor()
 		end
 
+		if setMem then
+			mem_device_1_dr = math.abs(string.sub(n1Value,-4,-4)-9)
+			mem_device_2_dr = math.abs(string.sub(n1Value,-3,-3)-9)
+			mem_device_3_dr = math.abs(string.sub(n1Value,-1,-1)-9)
+		end
+
 -- If in Climb mode display Climb speed
 		if mode == 2 then
 -- Display Cruise Climb checkbox (Climb type is MAX if this is unset)			
@@ -203,6 +227,7 @@ if PLANE_ICAO == "C525" then
 			tableAlt 	= tostring(GetValueFromIndexTable(N1ClimbAltIndex, 0, 41, PressureAlt_dr/1000))
 			climbSpeed = SpeedTable[climbType][tableAlt]
 		end
+	
 	end
 
 	function closed_n1calc(wnd)
