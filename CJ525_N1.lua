@@ -202,7 +202,14 @@ if PLANE_ICAO == "C525" then
 			imgui.PopStyleColor()
 		end
 
-		if setMem then
+-- Add check that there is a valid N1 value
+		if setMem and n1Value~="-" then
+
+-- If N1 value is an integer the add ".0" to the end
+			if not string.find(n1Value, ".") then
+				n1Value = n1Value .. ".0"
+			end
+			
 			mem_device_1_dr = math.abs(string.sub(n1Value,-4,-4)-9)
 			mem_device_2_dr = math.abs(string.sub(n1Value,-3,-3)-9)
 			mem_device_3_dr = math.abs(string.sub(n1Value,-1,-1)-9)
