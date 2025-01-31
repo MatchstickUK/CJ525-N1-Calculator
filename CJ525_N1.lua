@@ -6,7 +6,7 @@ if PLANE_ICAO == "C525" then
 	end
 
 -- initialise window settings
-	n1calc_wnd = float_wnd_create(300, 150, 1, true)
+	n1calc_wnd = float_wnd_create(300, 160, 1, true)
 	float_wnd_set_position(n1calc_wnd, 30, SCREEN_HIGHT-300)
 	float_wnd_set_title(n1calc_wnd, "CJ525 Engine Perf. Calculator")
 	float_wnd_set_imgui_builder(n1calc_wnd, "n1calc_on_build")
@@ -109,6 +109,7 @@ if PLANE_ICAO == "C525" then
 	local mode = 1
 	local antiIcingOn = false
 	local setMem = true
+	local setBug = true
 
 -- get X-Plane datarefs
 	dataref("PressureAlt_dr", "sim/flightmodel2/position/pressure_altitude")
@@ -118,6 +119,9 @@ if PLANE_ICAO == "C525" then
 	dataref("mem_device_1_dr", "afm/cj/center_panel/mem_device_1", "writable")
 	dataref("mem_device_2_dr", "afm/cj/center_panel/mem_device_2", "writable")
 	dataref("mem_device_3_dr", "afm/cj/center_panel/mem_device_3", "writable")
+	
+	dataref("asi_bug_dr", "afm/cj/f/pilot_panel/asi_bug_knob", "writable")
+
 
 	function n1calc_on_build(n1calc_wnd, x, y)  
 
@@ -150,21 +154,31 @@ if PLANE_ICAO == "C525" then
 		end
 
 
--- Display Anto-Icing checkbox
+-- Display Anti-Icing checkbox
 		changed, newVal = imgui.Checkbox(" Anti-Icing", antiIcingOn)
 		if changed then
 			antiIcingOn = newVal
 		end
 		
-		imgui.SameLine()
-		imgui.TextUnformatted("    ")
-		imgui.SameLine()
+--		imgui.SameLine()
+--		imgui.TextUnformatted("    ")
+--		imgui.SameLine()
 				
--- Display Anto-Icing checkbox
-		changed, newVal = imgui.Checkbox(" Set Mem Display",setMem)
+-- Display Memo Display checkbox
+		changed, newVal = imgui.Checkbox(" Set Memo Display",setMem)
 		if changed then
 			setMem = newVal
 		end
+
+		imgui.SameLine()
+		imgui.TextUnformatted("  ")
+		imgui.SameLine()
+
+-- Display ASI Bug checkbox
+		changed, newVal = imgui.Checkbox(" Set ASI Bug",setBug)
+		if changed then
+			setBug = newVal
+	end
 
 
 -- Look up index values for temp, alt from index tables and corresponding data value from arrays for that mode
@@ -231,8 +245,12 @@ if PLANE_ICAO == "C525" then
 				climbType="MAX"
 			end
 -- Look up climb speed from data table. We've set the row index value according to the Cruise Climb checkbox value and we have the column index value from the temp value calculated earlier so we can go directly to the data table
-			tableAlt 	= tostring(GetValueFromIndexTable(N1ClimbAltIndex, 0, 41, PressureAlt_dr/1000))
+			tableAlt 	= tostring(GetValueFromIndexTable(N1ClimbAltIndex, 0, 40, PressureAlt_dr/1000))
 			climbSpeed = SpeedTable[climbType][tableAlt]
+			
+			if setMem and tonumber(climbSpeed) then
+				asi_bug_dr = tonumber(climbSpeed)
+			end
 		end
 	
 	end
