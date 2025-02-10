@@ -170,15 +170,19 @@ if PLANE_ICAO == "C525" then
 			setMem = newVal
 		end
 
-		imgui.SameLine()
-		imgui.TextUnformatted("  ")
-		imgui.SameLine()
+-- If in Climb mode display ASI Bug checkbox
+		if mode == 2 then
 
--- Display ASI Bug checkbox
-		changed, newVal = imgui.Checkbox(" Set ASI Bug",setBug)
-		if changed then
-			setBug = newVal
-	end
+			imgui.SameLine()
+			imgui.TextUnformatted("  ")
+			imgui.SameLine()
+
+	-- Display ASI Bug checkbox
+			changed, newVal = imgui.Checkbox(" Set ASI Bug",setBug)
+			if changed then
+				setBug = newVal
+			end
+		end
 
 
 -- Look up index values for temp, alt from index tables and corresponding data value from arrays for that mode
