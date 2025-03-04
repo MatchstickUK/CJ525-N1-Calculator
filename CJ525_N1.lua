@@ -252,7 +252,7 @@ if PLANE_ICAO == "C525" then
 			tableAlt 	= tostring(GetValueFromIndexTable(N1ClimbAltIndex, 0, 40, PressureAlt_dr/1000))
 			climbSpeed = SpeedTable[climbType][tableAlt]
 			
-			if setMem and tonumber(climbSpeed) then
+			if setBug and tonumber(climbSpeed) then
 				asi_bug_dr = tonumber(climbSpeed)
 			end
 		end
